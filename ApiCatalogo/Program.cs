@@ -8,8 +8,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var connStrings = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<CatalogoContex>(options 
-    => options.UseMySql(connStrings, ServerVersion.AutoDetect("connStrings")));
+builder.Services.AddDbContext<CatalogoContex>(options
+    => options.UseMySql(connStrings, ServerVersion.AutoDetect(connStrings)));
 
 var app = builder.Build();
 
