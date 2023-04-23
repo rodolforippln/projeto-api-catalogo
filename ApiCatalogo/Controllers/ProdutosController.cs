@@ -1,5 +1,6 @@
 ﻿using ApiCatalogo.Data;
 using ApiCatalogo.Models;
+using ApiCatalogo.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,7 @@ namespace ApiCatalogo.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GellAll()
+        public async Task<IActionResult> GetlAllAsync()
         {
             try
             {
@@ -26,14 +27,14 @@ namespace ApiCatalogo.Controllers
 
                 return Ok(produtos);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Erro interno no servidor");
             }
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             try
             {
@@ -52,26 +53,35 @@ namespace ApiCatalogo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Produto produto)
+        public async Task<IActionResult> CreateAsync(EditorProdutoViewModel model)
         {
             try
             {
+                var produto = new Produto
+                {
+                    Nome = model.Nome,
+                    Descricao = model.Descricao,
+                    Preco = model.Preco,
+                    ImagemUrl = model.ImagemUrl,
+                    CategoriaId = model.CategoriaId
+                };
+
                 await _catalogoContex.Produtos.AddAsync(produto);
                 await _catalogoContex.SaveChangesAsync();
-                return Created("", produto);
+                return Created($"v1/api/produtos/{produto.ProdutoId}", produto);
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
                 return StatusCode(500, "Não foi possível alterar o produto");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Erro interno no servidor");
             }            
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(Produto model, int id)
+        public async Task<IActionResult> UpdateAsync(EditorProdutoViewModel model, int id)
         {
             try
             {
@@ -84,7 +94,6 @@ namespace ApiCatalogo.Controllers
                 produto.Descricao = model.Descricao;
                 produto.Preco = model.Preco;
                 produto.ImagemUrl = model.ImagemUrl;
-                produto.Estoque = model.Estoque;
                 produto.CategoriaId = model.CategoriaId;
 
                 _catalogoContex.Produtos.Update(produto);
@@ -92,11 +101,11 @@ namespace ApiCatalogo.Controllers
 
                 return Ok(produto);
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
                 return StatusCode(500, "Não foi possível alterar o produto");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Erro interno no servidor");
             }
@@ -117,11 +126,11 @@ namespace ApiCatalogo.Controllers
 
                 return Ok(produto);
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
                 return StatusCode(500, "Não foi possível remover o produto");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Erro interno no servidor");
             }
