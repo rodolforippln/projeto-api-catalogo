@@ -5,7 +5,7 @@ namespace ApiCatalogo.ViewModel;
 public class EditorProdutoViewModel
 {
     [Required(ErrorMessage = "O nome é obrigatório")]
-    [StringLength(50, MinimumLength = 3, ErrorMessage = "O nome deve conter entre 3 e 50 ctacteres")]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "O nome deve conter entre 3 e 50 caracteres")]
     public string? Nome { get; set; }
 
     [Required(ErrorMessage = "O nome é obrigatório")]

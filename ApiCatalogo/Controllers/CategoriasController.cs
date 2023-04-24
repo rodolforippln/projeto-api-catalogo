@@ -6,7 +6,7 @@ using ApiCatalogo.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiCatalogo.Controllers;
+namespace ApiCatalogo.Controllers; 
 
 [ApiController]
 [Route("v1/api/[controller]")]
@@ -62,7 +62,8 @@ public class CategoriasController : Controller
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.CategoriaId == id);
 
-            if (categoria is null) return NotFound(new ResultViewModel<Categoria>("Categoria não encontrada"));
+            if (categoria is null) 
+                return NotFound(new ResultViewModel<Categoria>("Categoria não encontrada"));
 
             return Ok(new ResultViewModel<Categoria>(categoria));
         }
