@@ -1,6 +1,7 @@
 ﻿using ApiCatalogo.Data;
-using ApiCatalogo.DTOs;
 using ApiCatalogo.Models;
+using ApiCatalogo.ViewModel;
+using ApiCatalogo.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,11 +28,11 @@ public class CategoriasController : Controller
                 .Include(x => x.Produtos)
                 .ToListAsync();
 
-            return Ok(categorias);
+            return Ok(new ResultViewModel<List<Categoria>>(categorias));
         }
-        catch (Exception)
+        catch
         {
-            return StatusCode(500, "Erro interno no servidor");
+            return StatusCode(500, new ResultViewModel<List<Categoria>>("Falha interna no servidor"));
         }
     }
 
@@ -43,11 +44,11 @@ public class CategoriasController : Controller
             var categorias = await _catalogoContex.Categorias
                 .AsNoTracking().ToListAsync();
 
-            return Ok(categorias);
+            return Ok(new ResultViewModel<List<Categoria>>(categorias));
         }
         catch (Exception)
         {
-            return StatusCode(500, "Erro interno no servidor");
+            return StatusCode(500, new ResultViewModel<List<Categoria>>("Falha interna no servidor"));
         }
     }    
 
@@ -60,25 +61,25 @@ public class CategoriasController : Controller
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.CategoriaId == id);
 
-            if (categoria is null) return NotFound("Categoria não encontrado");
+            if (categoria is null) return NotFound(new ResultViewModel<Categoria>("Categoria não encontrada"));
 
-            return Ok(categoria);
+            return Ok(new ResultViewModel<Categoria>(categoria));
         }
         catch (Exception)
         {
-            return StatusCode(500, "Erro interno no servidor");
+            return StatusCode(500, new ResultViewModel<Categoria>("Erro interno no servidor"));
         }
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(CategoriaDto categoriaDto)
+    public async Task<IActionResult> CreateAsync(EditorCategoriaViewModel model)
     {
         try
         {
             var categoria = new Categoria
             {
-                Nome = categoriaDto.Nome,
-                ImagemUrl = categoriaDto.ImagemUrl
+                Nome = model.Nome,
+                ImagemUrl = model.ImagemUrl
             };
 
 
@@ -98,7 +99,7 @@ public class CategoriasController : Controller
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateAsync(CategoriaDto categoriaDto, int id)
+    public async Task<IActionResult> UpdateAsync(EditorCategoriaViewModel model, int id)
     {
         try
         {         
@@ -107,8 +108,8 @@ public class CategoriasController : Controller
 
             if (categoria is null) return NotFound("Categoria não encontrada");
 
-            categoria.Nome = categoriaDto.Nome;
-            categoria.ImagemUrl = categoriaDto.ImagemUrl;
+            categoria.Nome = model.Nome;
+            categoria.ImagemUrl = model.ImagemUrl;
 
 
             _catalogoContex.Categorias.Update(categoria);
