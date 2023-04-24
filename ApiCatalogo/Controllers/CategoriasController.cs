@@ -1,4 +1,5 @@
 ﻿using ApiCatalogo.Data;
+using ApiCatalogo.Extentions;
 using ApiCatalogo.Models;
 using ApiCatalogo.ViewModel;
 using ApiCatalogo.ViewModels;
@@ -74,6 +75,9 @@ public class CategoriasController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateAsync(EditorCategoriaViewModel model)
     {
+        if (!ModelState.IsValid) 
+            return BadRequest(new ResultViewModel<Categoria>(ModelState.GetErrors()));
+
         try
         {
             var categoria = new Categoria
@@ -82,31 +86,34 @@ public class CategoriasController : Controller
                 ImagemUrl = model.ImagemUrl
             };
 
-
             await _catalogoContex.Categorias.AddAsync(categoria);
             await _catalogoContex.SaveChangesAsync();
 
-            return Created($"v1/api/categorias/{categoria.CategoriaId}", categoria);
+            return Created($"v1/api/categorias/{categoria.CategoriaId}", new ResultViewModel<Categoria>(categoria));
         }
         catch (DbUpdateException)
         {
-            return StatusCode(500, "Não foi possível alterar a categoria");
+            return StatusCode(500, new ResultViewModel<Categoria>("Não foi possível criar a categoria"));
         }
         catch (Exception)
         {
-            return StatusCode(500, "Erro interno no servidor");
+            return StatusCode(500, new ResultViewModel<Categoria>("Erro interno do servidor"));
         }
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateAsync(EditorCategoriaViewModel model, int id)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(new ResultViewModel<Categoria>(ModelState.GetErrors()));
+
         try
         {         
             var categoria = await _catalogoContex
                 .Categorias.FirstOrDefaultAsync(x => x.CategoriaId == id);
 
-            if (categoria is null) return NotFound("Categoria não encontrada");
+            if (categoria is null) 
+                return NotFound(new ResultViewModel<Categoria>("Categoria não encontrada"));
 
             categoria.Nome = model.Nome;
             categoria.ImagemUrl = model.ImagemUrl;
@@ -115,15 +122,15 @@ public class CategoriasController : Controller
             _catalogoContex.Categorias.Update(categoria);
             await _catalogoContex.SaveChangesAsync();
 
-            return Ok(categoria);
+            return Ok(new ResultViewModel<Categoria>(categoria));
         }
         catch (DbUpdateException)
         {
-            return StatusCode(500, "Não foi possível alterar a categoria");
+            return StatusCode(500, new ResultViewModel<Categoria>("Não foi possível alterar a categoria"));
         }
         catch (Exception)
         {
-            return StatusCode(500, "Erro interno no servidor");
+            return StatusCode(500, new ResultViewModel<Categoria>("Erro interno no servidor"));
         }
     }
 
@@ -135,20 +142,21 @@ public class CategoriasController : Controller
             var categoria = await _catalogoContex
                 .Categorias.FirstOrDefaultAsync(x => x.CategoriaId == id);
 
-            if (categoria is null) return NotFound("Categoria não encontrada");
+            if (categoria is null) 
+                return NotFound(new ResultViewModel<Categoria>("Categoria não encontrada"));
 
             _catalogoContex.Categorias.Remove(categoria);
             await _catalogoContex.SaveChangesAsync();
 
-            return Ok(categoria);
+            return Ok(new ResultViewModel<Categoria>(categoria));
         }
         catch (DbUpdateException)
         {
-            return StatusCode(500, "Não foi possível remover a categoria");
+            return StatusCode(500, new ResultViewModel<Categoria>("Não foi possível remover a categoria"));
         }
         catch (Exception)
         {
-            return StatusCode(500, "Erro interno no servidor");
+            return StatusCode(500, new ResultViewModel<Categoria>("Erro interno do servidor"));
         }
     }
 }
